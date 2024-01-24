@@ -1,0 +1,46 @@
+plugins {
+    id 'java-library'
+    id 'io.qameta.allure' version '2.10.0'
+    id "io.freefair.lombok" version "6.0.0-m2"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(
+            'com.codeborne:selenide:6.19.0',
+            'org.junit.jupiter:junit-jupiter:5.8.2',
+            'org.slf4j:slf4j-simple:2.0.9',
+            'org.assertj:assertj-core:3.24.1',
+            'io.qameta.allure:allure-rest-assured:2.25.0',
+            'io.rest-assured:rest-assured:5.3.0')
+}
+
+allure {
+    report {
+        version.set("2.24.1") //версия Allure Report (https://github.com/allure-framework/allure2)
+    }
+    adapter {
+        aspectjWeaver.set(true) // обработка аннотации @Step
+        frameworks {
+            junit5 {
+                adapterVersion.set("2.24.0") //версия Allure JUnit5 (https://github.com/allure-framework/allure-java)
+            }
+        }
+    }
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {
+    systemProperties(System.getProperties())
+    useJUnitPlatform()
+}
