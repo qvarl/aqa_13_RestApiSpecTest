@@ -1,6 +1,8 @@
+import io.qameta.allure.restassured.AllureRestAssured;
 import models.*;
 import org.junit.jupiter.api.Test;
 
+import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +21,9 @@ public class ReqresInTest {
         CreateUserResponseModel response = given()
                 .baseUri(BASE_URL)
                 .log().uri()
+                .log().headers()
+                .log().body()
+                .filter(withCustomTemplates())
                 .contentType(JSON)
                 .body(requestData)
 
@@ -41,6 +46,9 @@ public class ReqresInTest {
         given()
                 .baseUri(BASE_URL)
                 .log().uri()
+                .log().headers()
+                .log().body()
+                .filter(withCustomTemplates())
 
                 .when()
                 .delete("/api/users/2")
@@ -55,22 +63,23 @@ public class ReqresInTest {
 
         Integer userID = 1;
 
-        ViewSingleUserResponseModel response =
-                given()
-                        .baseUri(BASE_URL)
-                        .log().uri()
+        ViewSingleUserResponseModel response = given()
+                .baseUri(BASE_URL)
+                .log().uri()
+                .log().headers()
+                .log().body()
+                .filter(withCustomTemplates())
 
-                        .when()
-                        .get("/api/users/" + userID)
+                .when()
+                .get("/api/users/" + userID)
 
-                        .then()
-                        .log().status()
-                        .log().body()
-                        .statusCode(200)
-                        .extract().as(ViewSingleUserResponseModel.class);
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().as(ViewSingleUserResponseModel.class);
 
         assertThat(response.getData().getId()).isEqualTo(userID);
-
     }
 
     @Test
@@ -81,6 +90,9 @@ public class ReqresInTest {
         given()
                 .baseUri(BASE_URL)
                 .log().uri()
+                .log().headers()
+                .log().body()
+                .filter(withCustomTemplates())
 
                 .when()
                 .get("/api/users/" + userID)
@@ -100,6 +112,9 @@ public class ReqresInTest {
         RegistredResponsetModel response = given()
                 .baseUri(BASE_URL)
                 .log().uri()
+                .log().headers()
+                .log().body()
+                .filter(withCustomTemplates())
                 .contentType(JSON)
                 .body(requestData)
 
