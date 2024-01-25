@@ -1,21 +1,22 @@
+import models.*;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReqresInTest {
 
     String BASE_URL = "https://reqres.in";
 
     @Test
-    void CreateUserTest() {
+    void createUserTest() {
 
-        String name = "morpheus";
-        String job = "QA";
-        String requestData = "{ \"name\": \"" + name + "\", \"job\": \"" + job + "\"}";
+        CreateUserRequestModel requestData = new CreateUserRequestModel();
+        requestData.setName("morpheus");
+        requestData.setJob("AQA");
 
-        given()
+        CreateUserResponseModel response = given()
                 .baseUri(BASE_URL)
                 .log().uri()
                 .contentType(JSON)
@@ -28,11 +29,14 @@ public class ReqresInTest {
                 .log().status()
                 .log().body()
                 .statusCode(201)
-                .body("name", is(name), "job", is(job));
+                .extract().as(CreateUserResponseModel.class);
+
+        assertThat(response.getName()).isEqualTo(requestData.getName());
+        assertThat(response.getJob()).isEqualTo(requestData.getJob());
     }
 
     @Test
-    void checkDeleteUserStatusTest() {
+    void deleteUserTest() {
 
         given()
                 .baseUri(BASE_URL)
@@ -47,22 +51,26 @@ public class ReqresInTest {
     }
 
     @Test
-    void checkViewUserIDTest() {
+    void viewSingleUserTest() {
 
         Integer userID = 1;
 
-        given()
-                .baseUri(BASE_URL)
-                .log().uri()
+        ViewSingleUserResponseModel response =
+                given()
+                        .baseUri(BASE_URL)
+                        .log().uri()
 
-                .when()
-                .get("/api/users/" + userID)
+                        .when()
+                        .get("/api/users/" + userID)
 
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("data.id", is(userID));
+                        .then()
+                        .log().status()
+                        .log().body()
+                        .statusCode(200)
+                        .extract().as(ViewSingleUserResponseModel.class);
+
+        assertThat(response.getData().getId()).isEqualTo(userID);
+
     }
 
     @Test
@@ -86,9 +94,10 @@ public class ReqresInTest {
     @Test
     void registredWithoutEmailTest() {
 
-        String requestData = "{ \"password\": \"pistol\"}";
+        RegistredRequestModel requestData = new RegistredRequestModel();
+        requestData.setPassword("pistol");
 
-        given()
+        RegistredResponsetModel response = given()
                 .baseUri(BASE_URL)
                 .log().uri()
                 .contentType(JSON)
@@ -101,6 +110,8 @@ public class ReqresInTest {
                 .log().status()
                 .log().body()
                 .statusCode(400)
-                .body("error", is("Missing email or username"));
+                .extract().as(RegistredResponsetModel.class);
+
+        assertThat(response.getError()).isEqualTo("Missing email or username");
     }
 }
