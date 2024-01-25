@@ -1,15 +1,31 @@
-import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.RestAssured;
 import models.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static helpers.CustomAllureListener.withCustomTemplates;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
+import static specs.CreateUserSpec.createUserRequestSpec;
+import static specs.CreateUserSpec.createUserResponseSpec;
+import static specs.DeleteUserSpec.deleteUserRequestSpec;
+import static specs.DeleteUserSpec.deleteUserResponseSpec;
+import static specs.RegisterWithoutEmail.registerWithoutEmailRequestSpec;
+import static specs.RegisterWithoutEmail.registerWithoutEmailResponseSpec;
+import static specs.ViewNotFoundUserSpec.viewNotFoundSingleUserRequestSpec;
+import static specs.ViewNotFoundUserSpec.viewNotFoundUserSingleResponseSpec;
+import static specs.ViewSingleUserSpec.viewSingleUserRequestSpec;
+import static specs.ViewSingleUserSpec.viewSingleUserResponseSpec;
 
 public class ReqresInTest {
 
-    String BASE_URL = "https://reqres.in";
+    @BeforeAll
+    static void setUp() {
+
+        RestAssured.baseURI = "https://reqres.in";
+        RestAssured.basePath = "/api";
+        RestAssured.filters(withCustomTemplates());
+    }
 
     @Test
     void createUserTest() {
@@ -18,22 +34,12 @@ public class ReqresInTest {
         requestData.setName("morpheus");
         requestData.setJob("AQA");
 
-        CreateUserResponseModel response = given()
-                .baseUri(BASE_URL)
-                .log().uri()
-                .log().headers()
-                .log().body()
-                .filter(withCustomTemplates())
-                .contentType(JSON)
+        CreateUserResponseModel response = given(createUserRequestSpec)
                 .body(requestData)
-
                 .when()
-                .post("/api/users")
-
+                .post("/users")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
+                .spec(createUserResponseSpec)
                 .extract().as(CreateUserResponseModel.class);
 
         assertThat(response.getName()).isEqualTo(requestData.getName());
@@ -43,88 +49,52 @@ public class ReqresInTest {
     @Test
     void deleteUserTest() {
 
-        given()
-                .baseUri(BASE_URL)
-                .log().uri()
-                .log().headers()
-                .log().body()
-                .filter(withCustomTemplates())
-
+        given(deleteUserRequestSpec)
                 .when()
-                .delete("/api/users/2")
-
+                .delete("/users/2")
                 .then()
-                .log().status()
-                .statusCode(204);
+                .spec(deleteUserResponseSpec);
     }
 
     @Test
     void viewSingleUserTest() {
 
-        Integer userID = 1;
+        int userID = 1;
 
-        ViewSingleUserResponseModel response = given()
-                .baseUri(BASE_URL)
-                .log().uri()
-                .log().headers()
-                .log().body()
-                .filter(withCustomTemplates())
-
+        ViewSingleUserResponseModel response = given(viewSingleUserRequestSpec)
                 .when()
-                .get("/api/users/" + userID)
-
+                .get("/users/" + userID)
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
+                .spec(viewSingleUserResponseSpec)
                 .extract().as(ViewSingleUserResponseModel.class);
 
         assertThat(response.getData().getId()).isEqualTo(userID);
     }
 
     @Test
-    void viewNotFoundUserTest() {
+    void viewNotFoundSingleUserTest() {
 
-        Integer userID = 23;
+        int userID = 23;
 
-        given()
-                .baseUri(BASE_URL)
-                .log().uri()
-                .log().headers()
-                .log().body()
-                .filter(withCustomTemplates())
-
+        given(viewNotFoundSingleUserRequestSpec)
                 .when()
-                .get("/api/users/" + userID)
-
+                .get("/users/" + userID)
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(404);
+                .spec(viewNotFoundUserSingleResponseSpec);
     }
 
     @Test
-    void registredWithoutEmailTest() {
+    void registerWithoutEmailTest() {
 
         RegistredRequestModel requestData = new RegistredRequestModel();
         requestData.setPassword("pistol");
 
-        RegistredResponsetModel response = given()
-                .baseUri(BASE_URL)
-                .log().uri()
-                .log().headers()
-                .log().body()
-                .filter(withCustomTemplates())
-                .contentType(JSON)
+        RegistredResponsetModel response = given(registerWithoutEmailRequestSpec)
                 .body(requestData)
-
                 .when()
-                .post("/api/register")
-
+                .post("/register")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(400)
+                .spec(registerWithoutEmailResponseSpec)
                 .extract().as(RegistredResponsetModel.class);
 
         assertThat(response.getError()).isEqualTo("Missing email or username");
