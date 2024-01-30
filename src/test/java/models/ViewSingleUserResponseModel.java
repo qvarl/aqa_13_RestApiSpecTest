@@ -1,6 +1,7 @@
 package models;
 
-import lombok.Data;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @lombok.Data
 public class ViewSingleUserResponseModel {
@@ -18,6 +19,12 @@ public class ViewSingleUserResponseModel {
     public class Data {
 
         private int id;
-        private String email, first_name, last_name, avatar;
+        private String email, avatar;
+
+        @JsonProperty("first_name")
+        private String firstName;
+
+        @JsonProperty("last_name")
+        private String lastName;
     }
 }

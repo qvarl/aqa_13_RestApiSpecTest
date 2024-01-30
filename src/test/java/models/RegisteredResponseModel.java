@@ -3,7 +3,7 @@ package models;
 import lombok.Data;
 
 @Data
-public class RegistredResponsetModel {
+public class RegisteredResponseModel {
 
     private String error;
 }

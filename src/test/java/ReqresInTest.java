@@ -86,16 +86,16 @@ public class ReqresInTest {
     @Test
     void registerWithoutEmailTest() {
 
-        RegistredRequestModel requestData = new RegistredRequestModel();
+        RegisteredRequestModel requestData = new RegisteredRequestModel();
         requestData.setPassword("pistol");
 
-        RegistredResponsetModel response = given(registerWithoutEmailRequestSpec)
+        RegisteredResponseModel response = given(registerWithoutEmailRequestSpec)
                 .body(requestData)
                 .when()
                 .post("/register")
                 .then()
                 .spec(registerWithoutEmailResponseSpec)
-                .extract().as(RegistredResponsetModel.class);
+                .extract().as(RegisteredResponseModel.class);
 
         assertThat(response.getError()).isEqualTo("Missing email or username");
     }
